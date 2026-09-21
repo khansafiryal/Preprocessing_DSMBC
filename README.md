@@ -25,21 +25,19 @@ Prinsip utama yang digunakan adalah **fit pada training data, kemudian transform
 
 ## Data Cleaning dan Domain Validation
 
-Exact duplicate dihapus agar observasi yang sama tidak muncul lebih dari satu kali.
+Exact duplicate dihapus agar observasi yang sama tidak muncul lebih dari satu kali. Domain validation juga dilakukan pada fitur numerik berdasarkan aturan yang digunakan pada latihan.
 
-Domain validation dilakukan pada fitur numerik. Usia di luar rentang 1 sampai 100 tahun dianggap tidak wajar untuk konteks latihan ini. Lama bekerja yang melebihi usia juga dianggap tidak valid. Nilai invalid diubah menjadi missing value untuk ditangani pada tahap imputasi.
+Usia di luar rentang 1 sampai 100 tahun dianggap tidak wajar untuk konteks latihan ini. Lama bekerja yang melebihi usia juga dianggap tidak valid. Nilai invalid diubah menjadi missing value untuk ditangani pada tahap imputasi.
 
 ## Outlier Detection
 
-Outlier dideteksi menggunakan **boxplot dan IQR**.
-
-Kandidat outlier tidak langsung dihapus. Nilai tersebut diperiksa kembali berdasarkan domain. Valid extreme value tetap dipertahankan apabila masih masuk akal.
+Outlier dideteksi menggunakan **boxplot dan IQR**. Kandidat outlier tidak langsung dihapus, tetapi diperiksa kembali berdasarkan domain. Nilai ekstrem yang masih masuk akal tetap dipertahankan sebagai valid extreme value.
 
 ## Missing Value Handling
 
 Beberapa metode diperkenalkan dan dibandingkan, yaitu mean, median, mode, constant, dan KNN Imputer.
 
-Treatment final yang digunakan adalah:
+Treatment final yang digunakan:
 
 1. `person_age` menggunakan **median imputation**
 2. `person_emp_length` menggunakan **median imputation**
@@ -55,13 +53,9 @@ Notebook menambahkan dua fitur baru yang memiliki makna jelas.
 
 Fitur ini menggambarkan kombinasi jumlah pinjaman dan tingkat bunga.
 
-$$
-\text{Interest Burden Proxy}
-=
-\text{Loan Amount}
-\times
-\frac{\text{Interest Rate}}{100}
-$$
+**Rumus:**
+
+`Interest Burden Proxy = Loan Amount × (Interest Rate / 100)`
 
 Implementasi:
 
@@ -69,15 +63,15 @@ Implementasi:
 interest_burden_proxy = loan_amnt * (loan_int_rate / 100)
 ```
 
+Nilai yang lebih besar menunjukkan kombinasi jumlah pinjaman dan tingkat bunga yang lebih tinggi. Fitur ini hanya digunakan sebagai proxy dan tidak merepresentasikan cicilan atau total bunga aktual.
+
 ### Employment Age Ratio
 
 Fitur ini menunjukkan lama bekerja relatif terhadap usia peminjam.
 
-$$
-\text{Employment Age Ratio}
-=
-\frac{\text{Employment Length}}{\text{Age}}
-$$
+**Rumus:**
+
+`Employment Age Ratio = Employment Length / Age`
 
 Implementasi:
 
@@ -85,11 +79,11 @@ Implementasi:
 employment_age_ratio = person_emp_length / person_age
 ```
 
+Nilai yang lebih tinggi menunjukkan lama bekerja yang lebih besar apabila dibandingkan dengan usia peminjam.
+
 ## Skewness Handling
 
-Skewness diperiksa pada seluruh fitur numerik training data.
-
-Fitur dengan absolute skewness di atas 1 dibandingkan menggunakan:
+Skewness diperiksa pada seluruh fitur numerik training data. Fitur dengan absolute skewness di atas 1 dibandingkan menggunakan:
 
 1. Original
 2. Log1p Transformation
@@ -99,7 +93,7 @@ Transformasi final dipilih berdasarkan perubahan distribusi dan nilai skewness. 
 
 ## Categorical Encoding
 
-Encoding disesuaikan dengan jenis fitur kategorikal.
+Encoding disesuaikan dengan jenis fitur kategorikal:
 
 1. Binary mapping untuk `cb_person_default_on_file`
 2. Ordinal mapping untuk `loan_grade`
@@ -113,9 +107,7 @@ StandardScaler, MinMaxScaler, dan RobustScaler dibandingkan terlebih dahulu.
 
 **RobustScaler digunakan sebagai treatment final** sebab dataset masih memiliki valid extreme values yang dipertahankan.
 
-Scaling terutama relevan untuk model yang sensitif terhadap skala seperti KNN, SVM, Logistic Regression, dan Neural Network.
-
-Model berbasis tree seperti Decision Tree, Random Forest, Gradient Boosting, dan XGBoost umumnya tidak memerlukan scaling.
+Scaling terutama relevan untuk model yang sensitif terhadap skala seperti KNN, SVM, Logistic Regression, dan Neural Network. Model berbasis tree seperti Decision Tree, Random Forest, Gradient Boosting, dan XGBoost umumnya tidak memerlukan scaling.
 
 ## Final Preprocessing Check
 
@@ -139,4 +131,4 @@ Treatment class imbalance hanya dilakukan pada training data agar validation dan
 
 ## Library yang Digunakan
 
-Notebook menggunakan `pandas`, `NumPy`, `Matplotlib`, dan `scikit learn` untuk pengolahan data, visualisasi, pembagian data, imputasi, encoding, dan scaling.
+Notebook menggunakan `pandas`, `NumPy`, `Matplotlib`, dan `scikit-learn` untuk pengolahan data, visualisasi, pembagian data, imputasi, encoding, dan scaling.
