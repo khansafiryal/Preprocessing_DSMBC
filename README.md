@@ -1,145 +1,142 @@
 # DSMBC Day 2 Data Preprocessing
 
-Notebook ini digunakan pada sesi Day 2 Data Science Mini Bootcamp untuk mempelajari proses data preprocessing setelah peserta menyelesaikan Exploratory Data Analysis pada sesi sebelumnya. Fokus utama notebook adalah menyiapkan data agar lebih bersih, konsisten, dan siap digunakan pada tahap pemodelan machine learning.
+Notebook ini digunakan pada Day 2 Data Science Mini Bootcamp untuk mempelajari proses data preprocessing setelah Exploratory Data Analysis. Fokus utama notebook adalah menyiapkan data agar lebih bersih, konsisten, dan siap digunakan pada tahap modeling.
 
-Materi disusun dengan pendekatan yang tetap ramah untuk pemula. Setiap teknik diperkenalkan melalui konsep singkat, percobaan pada data, visualisasi, serta pembahasan mengenai alasan pemilihan treatment yang digunakan.
+Setiap tahap membahas pemeriksaan data, perbandingan metode, alasan pemilihan metode, dan treatment final berdasarkan karakteristik data.
 
 ## Tujuan Pembelajaran
 
-Setelah menyelesaikan notebook ini, peserta diharapkan mampu memahami hubungan antara hasil EDA dan keputusan preprocessing, mengenali masalah kualitas data, membagi data dengan tepat, menangani missing value, memeriksa outlier berdasarkan statistik dan domain, melakukan transformasi pada distribusi yang sangat skewed, memahami feature engineering, mengubah fitur kategorikal menjadi numerik, serta melakukan feature scaling.
+Peserta diharapkan mampu melakukan data cleaning, domain validation, menangani outlier dan missing value, melakukan feature engineering, menangani skewness, melakukan categorical encoding dan feature scaling, serta memahami prinsip pencegahan data leakage.
 
-Peserta juga diperkenalkan pada prinsip pencegahan data leakage agar proses preprocessing tidak menggunakan informasi yang seharusnya hanya tersedia pada validation data atau test data.
+Prinsip utama yang digunakan adalah **fit pada training data, kemudian transform validation dan test data**.
 
 ## Alur Materi
 
-1. Instalasi dan import library
+1. Data loading dan pemeriksaan awal
+2. Data cleaning dan domain validation
+3. Train, validation, dan test split
+4. Outlier detection
+5. Missing value handling
+6. Feature engineering
+7. Skewness handling
+8. Categorical encoding
+9. Feature scaling
+10. Final preprocessing check
 
-2. Memuat dataset
+## Data Cleaning dan Domain Validation
 
-3. Ringkasan masalah data yang akan ditangani
+Exact duplicate dihapus agar observasi yang sama tidak muncul lebih dari satu kali.
 
-4. Data cleaning
+Domain validation dilakukan pada fitur numerik. Usia di luar rentang 1 sampai 100 tahun dianggap tidak wajar untuk konteks latihan ini. Lama bekerja yang melebihi usia juga dianggap tidak valid. Nilai invalid diubah menjadi missing value untuk ditangani pada tahap imputasi.
 
-5. Feature dan target separation
+## Outlier Detection
 
-6. Train, validation, dan test split
+Outlier dideteksi menggunakan **boxplot dan IQR**.
 
-7. Missing value handling
-
-8. Outlier detection dan domain validation
-
-9. Skewness handling
-
-10. Feature engineering
-
-11. Categorical encoding
-
-12. Feature scaling
-
-13. Final preprocessing check
-
-14. Ringkasan treatment final
-
-15. Mini assignment
-
-## Data Cleaning
-
-Data cleaning dilakukan untuk menangani masalah yang sudah dapat dinilai sebagai masalah kualitas data. Exact duplicate dihapus agar observasi yang sama tidak muncul lebih dari satu kali. Nilai yang tidak masuk akal juga diperiksa berdasarkan konteks domain sebelum menentukan treatment.
-
-Nilai yang terlihat ekstrem secara statistik tidak langsung dianggap salah. Pemeriksaan domain tetap diperlukan untuk membedakan nilai yang benar benar tidak valid dengan nilai ekstrem yang masih mungkin terjadi.
-
-## Train, Validation, dan Test Split
-
-Dataset dibagi menjadi training data, validation data, dan test data. Stratification digunakan agar proporsi kelas target tetap relatif konsisten pada setiap subset.
-
-Setelah proses pembagian data, seluruh parameter preprocessing dipelajari hanya dari training data. Validation data dan test data hanya menerima transformasi berdasarkan parameter yang telah diperoleh dari training data.
-
-Prinsip utama yang digunakan adalah:
-
-**Fit pada training data, kemudian transform validation data dan test data.**
-
-Pendekatan ini digunakan untuk mengurangi risiko data leakage.
+Kandidat outlier tidak langsung dihapus. Nilai tersebut diperiksa kembali berdasarkan domain. Valid extreme value tetap dipertahankan apabila masih masuk akal.
 
 ## Missing Value Handling
 
-Notebook memperkenalkan beberapa pendekatan sederhana untuk menangani missing value, yaitu penghapusan observasi, mean imputation, median imputation, dan mode imputation.
+Beberapa metode diperkenalkan dan dibandingkan, yaitu mean, median, mode, constant, dan KNN Imputer.
 
-Perbandingan mean dan median dilakukan agar peserta dapat melihat bahwa pemilihan metode perlu mempertimbangkan karakteristik distribusi data. Treatment akhir menggunakan median imputation pada fitur numerik yang memiliki missing value karena pendekatan ini lebih tahan terhadap keberadaan nilai ekstrem.
+Treatment final yang digunakan adalah:
 
-## Outlier Detection dan Domain Validation
+1. `person_age` menggunakan **median imputation**
+2. `person_emp_length` menggunakan **median imputation**
+3. `loan_int_rate` menggunakan **mean imputation**
 
-Outlier dideteksi menggunakan IQR dan Z Score sebagai metode awal untuk menemukan observasi yang perlu diperiksa lebih lanjut.
-
-Hasil deteksi statistik tidak langsung digunakan sebagai dasar untuk menghapus data. Kandidat outlier diperiksa kembali berdasarkan konteks domain untuk menentukan apakah nilainya merupakan kesalahan data atau hanya nilai ekstrem yang masih valid.
-
-Capping juga diperkenalkan sebagai salah satu alternatif ketika nilai ekstrem perlu dibatasi tanpa menghapus seluruh observasi.
-
-## Skewness Handling
-
-Distribusi fitur numerik diperiksa kembali setelah data cleaning. Pada fitur dengan distribusi yang sangat menceng ke kanan, beberapa transformasi sederhana dibandingkan.
-
-Notebook memperkenalkan log transformation dan square root transformation. Log transformation digunakan sebagai treatment akhir pada fitur pendapatan karena mampu mengurangi skewness secara signifikan dan menghasilkan distribusi yang lebih seimbang.
+KNN Imputer diperkenalkan sebagai metode yang memanfaatkan kemiripan antarobservasi, tetapi tidak digunakan sebagai treatment final agar baseline preprocessing tetap sederhana dan mudah dipahami.
 
 ## Feature Engineering
 
-Feature engineering digunakan untuk membentuk representasi data yang lebih informatif dari fitur yang sudah tersedia.
+Notebook menambahkan dua fitur baru yang memiliki makna jelas.
 
-Notebook memperkenalkan ratio feature dan binning sebagai contoh sederhana. Sebelum membuat fitur baru, peserta juga diajak memeriksa apakah informasi serupa sebenarnya sudah tersedia dalam dataset agar tidak menghasilkan fitur yang redundant.
+### Interest Burden Proxy
+
+Fitur ini menggambarkan kombinasi jumlah pinjaman dan tingkat bunga.
+
+$$
+\text{Interest Burden Proxy}
+=
+\text{Loan Amount}
+\times
+\frac{\text{Interest Rate}}{100}
+$$
+
+Implementasi:
+
+```python
+interest_burden_proxy = loan_amnt * (loan_int_rate / 100)
+```
+
+### Employment Age Ratio
+
+Fitur ini menunjukkan lama bekerja relatif terhadap usia peminjam.
+
+$$
+\text{Employment Age Ratio}
+=
+\frac{\text{Employment Length}}{\text{Age}}
+$$
+
+Implementasi:
+
+```python
+employment_age_ratio = person_emp_length / person_age
+```
+
+## Skewness Handling
+
+Skewness diperiksa pada seluruh fitur numerik training data.
+
+Fitur dengan absolute skewness di atas 1 dibandingkan menggunakan:
+
+1. Original
+2. Log1p Transformation
+3. Square Root Transformation
+
+Transformasi final dipilih berdasarkan perubahan distribusi dan nilai skewness. Fitur tidak harus ditransformasi apabila hasil transformasi tidak memberikan perbaikan yang berarti.
 
 ## Categorical Encoding
 
-Beberapa teknik encoding diperkenalkan berdasarkan karakteristik fitur kategorikal.
+Encoding disesuaikan dengan jenis fitur kategorikal.
 
-1. Binary mapping digunakan untuk fitur yang hanya memiliki dua kategori.
+1. Binary mapping untuk `cb_person_default_on_file`
+2. Ordinal mapping untuk `loan_grade`
+3. One Hot Encoding untuk `person_home_ownership` dan `loan_intent`
 
-2. Ordinal encoding digunakan untuk kategori yang memiliki urutan alami.
-
-3. One Hot Encoding digunakan untuk kategori nominal yang tidak memiliki urutan.
-
-4. Frequency encoding diperkenalkan sebagai alternatif yang mempertahankan satu kolom dengan mengganti kategori berdasarkan frekuensi kemunculannya.
-
-Frequency encoding membantu menunjukkan bahwa One Hot Encoding bukan satu satunya pilihan, terutama ketika jumlah kategori cukup banyak dan penambahan kolom perlu dipertimbangkan.
+Unseen category pada validation dan test juga diperiksa. `handle_unknown="ignore"` digunakan agar kategori yang tidak muncul pada training data tidak menyebabkan error.
 
 ## Feature Scaling
 
-Notebook memperkenalkan StandardScaler, MinMaxScaler, dan RobustScaler agar peserta dapat melihat perbedaan cara setiap metode mengubah skala data.
+StandardScaler, MinMaxScaler, dan RobustScaler dibandingkan terlebih dahulu.
 
-StandardScaler digunakan sebagai treatment akhir untuk fitur numerik kontinu. Parameter scaler dipelajari dari training data kemudian diterapkan pada validation data dan test data.
+**RobustScaler digunakan sebagai treatment final** sebab dataset masih memiliki valid extreme values yang dipertahankan.
+
+Scaling terutama relevan untuk model yang sensitif terhadap skala seperti KNN, SVM, Logistic Regression, dan Neural Network.
+
+Model berbasis tree seperti Decision Tree, Random Forest, Gradient Boosting, dan XGBoost umumnya tidak memerlukan scaling.
 
 ## Final Preprocessing Check
 
-Pada bagian akhir dilakukan pemeriksaan untuk memastikan bahwa hasil preprocessing sudah konsisten.
+Pemeriksaan akhir memastikan:
 
-Pemeriksaan mencakup jumlah missing value, struktur kolom pada train validation dan test, tipe data akhir, jumlah fitur, serta konsistensi transformasi pada seluruh subset.
+1. Tidak terdapat missing value
+2. Tidak terdapat nilai infinity
+3. Seluruh predictor telah numerik
+4. Target tidak berada pada feature matrix
+5. Kolom train, validation, dan test sama
+6. Urutan kolom konsisten
 
-Hasil akhir preprocessing menghasilkan data numerik dengan struktur fitur yang sama pada training data, validation data, dan test data sehingga siap digunakan pada tahap modeling.
+Setelah seluruh pemeriksaan terpenuhi, data siap digunakan pada tahap modeling.
 
 ## Mini Assignment
 
-Peserta melanjutkan eksplorasi melalui dua topik berikut.
+1. **Feature Selection**
+2. **Class Imbalance Handling**
 
-1. Feature Selection
-
-Peserta mengevaluasi apakah seluruh fitur perlu digunakan atau terdapat fitur yang redundant maupun kurang informatif.
-
-2. Class Imbalance Handling
-
-Peserta mempelajari beberapa pendekatan untuk menangani distribusi kelas yang tidak seimbang. Treatment imbalance hanya dilakukan pada training data agar tidak menyebabkan data leakage.
+Treatment class imbalance hanya dilakukan pada training data agar validation dan test tetap merepresentasikan distribusi data asli.
 
 ## Library yang Digunakan
 
-Notebook menggunakan beberapa library utama dalam ekosistem Python.
-
-1. pandas untuk pengolahan data
-
-2. NumPy untuk operasi numerik
-
-3. Matplotlib untuk visualisasi
-
-4. Seaborn untuk visualisasi statistik
-
-5. SciPy untuk perhitungan statistik
-
-6. scikit learn untuk train test split, imputation, encoding, dan scaling
-
-
+Notebook menggunakan `pandas`, `NumPy`, `Matplotlib`, dan `scikit learn` untuk pengolahan data, visualisasi, pembagian data, imputasi, encoding, dan scaling.
