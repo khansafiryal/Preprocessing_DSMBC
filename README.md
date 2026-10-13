@@ -6,7 +6,7 @@ Setiap tahap membahas pemeriksaan data, perbandingan metode, alasan pemilihan me
 
 ## Tujuan Pembelajaran
 
-Peserta diharapkan mampu melakukan data cleaning, domain validation, menangani outlier dan missing value, melakukan feature engineering, menangani skewness, melakukan categorical encoding dan feature scaling, serta memahami prinsip pencegahan data leakage.
+Peserta diharapkan mampu melakukan data cleaning, domain validation, menangani outlier dan missing value, melakukan feature engineering, menangani skewness, melakukan categorical encoding dan feature scaling, mengenal metode class imbalance handling, serta memahami prinsip pencegahan data leakage.
 
 Prinsip utama yang digunakan adalah **fit pada training data, kemudian transform validation dan test data**.
 
@@ -21,7 +21,9 @@ Prinsip utama yang digunakan adalah **fit pada training data, kemudian transform
 7. Skewness handling
 8. Categorical encoding
 9. Feature scaling
-10. Final preprocessing check
+10. Class imbalance handling
+11. Final preprocessing check
+12. Export processed data
 
 ## Data Cleaning dan Domain Validation
 
@@ -89,7 +91,14 @@ Skewness diperiksa pada seluruh fitur numerik training data. Fitur dengan absolu
 2. Log1p Transformation
 3. Square Root Transformation
 
-Transformasi final dipilih berdasarkan perubahan distribusi dan nilai skewness. Fitur tidak harus ditransformasi apabila hasil transformasi tidak memberikan perbaikan yang berarti.
+Untuk setiap kandidat, transformasi final adalah transformasi yang menghasilkan absolute skewness paling kecil, walaupun hasilnya masih di atas 1.
+
+Treatment final yang digunakan:
+
+1. **Log1p** untuk `person_income`, `person_age`, `interest_burden_proxy`, dan `cb_person_cred_hist_length`
+2. **Square root** untuk `person_emp_length`, `loan_amnt`, dan `loan_percent_income`
+
+Skewness `person_age` turun dari 1,936 menjadi 1,177 setelah log1p, tetapi masih di atas 1 karena sebagian kecil peminjam berusia jauh lebih tua daripada mayoritas. Sisa kemiringan tersebut ditangani pada tahap scaling dengan RobustScaler. Transformasi lain seperti Box-Cox atau Yeo-Johnson tidak digunakan agar pipeline tetap sederhana.
 
 ## Categorical Encoding
 
@@ -109,6 +118,31 @@ StandardScaler, MinMaxScaler, dan RobustScaler dibandingkan terlebih dahulu.
 
 Scaling terutama relevan untuk model yang sensitif terhadap skala seperti KNN, SVM, Logistic Regression, dan Neural Network. Model berbasis tree seperti Decision Tree, Random Forest, Gradient Boosting, dan XGBoost umumnya tidak memerlukan scaling.
 
+## Class Imbalance Handling
+
+Training data memiliki kelas 0 sekitar 78 persen dan kelas 1 sekitar 22 persen. Notebook mendemonstrasikan tiga metode resampling:
+
+1. **Random Undersampling**, yaitu membuang sebagian data kelas mayoritas secara acak
+2. **Random Oversampling**, yaitu menyalin data kelas minoritas secara acak
+3. **SMOTE**, yaitu membuat data sintetis kelas minoritas di antara satu data dan tetangga terdekatnya
+
+**Rumus SMOTE:**
+
+`X_syn = X_i + (X_knn − X_i) × δ`
+
+Notebook juga memuat contoh hitung satu data sintetis. Penerapan pada training data menggunakan **SMOTENC** agar kolom kategorikal tetap berisi kategori yang valid dan kolom One Hot Encoding tidak bernilai pecahan.
+
+| Training data | Kelas 0 | Kelas 1 | Total |
+|---|---|---|---|
+| Original | 17.729 | 4.962 | 22.691 |
+| Random Undersampling | 4.962 | 4.962 | 9.924 |
+| Random Oversampling | 17.729 | 17.729 | 35.458 |
+| SMOTE | 17.729 | 17.729 | 35.458 |
+
+Resampling **hanya dilakukan pada training data setelah split**. Validation dan test tidak di-resample agar tetap merepresentasikan distribusi data asli. Encoder dan scaler di-fit dari training asli sebelum SMOTENC, lalu hanya dipakai untuk transform.
+
+Hasil resampling tersimpan sebagai `X_train_under`, `X_train_over`, dan `X_train_smote`, sedangkan `X_train_final` tetap menjadi baseline. Metode terbaik ditentukan pada tahap modeling.
+
 ## Final Preprocessing Check
 
 Pemeriksaan akhir memastikan:
@@ -122,13 +156,24 @@ Pemeriksaan akhir memastikan:
 
 Setelah seluruh pemeriksaan terpenuhi, data siap digunakan pada tahap modeling.
 
+## Export Processed Data
+
+Notebook menghasilkan empat file:
+
+1. `credit_train_processed.csv`
+2. `credit_validation_processed.csv`
+3. `credit_test_processed.csv`
+4. `credit_train_smote_processed.csv`, yaitu file opsional berisi training hasil SMOTENC
+
 ## Mini Assignment
 
 1. **Feature Selection**
 2. **Class Imbalance Handling**
 
+Pada tugas class imbalance, peserta melatih model yang sama pada `X_train_final`, `X_train_under`, `X_train_over`, dan `X_train_smote`, lalu membandingkan recall dan precision kelas 1 pada validation. Peserta juga dapat mencoba `class_weight="balanced"`.
+
 Treatment class imbalance hanya dilakukan pada training data agar validation dan test tetap merepresentasikan distribusi data asli.
 
 ## Library yang Digunakan
 
-Notebook menggunakan `pandas`, `NumPy`, `Matplotlib`, dan `scikit-learn` untuk pengolahan data, visualisasi, pembagian data, imputasi, encoding, dan scaling.
+Notebook menggunakan `pandas`, `NumPy`, `Matplotlib`, dan `scikit-learn` untuk pengolahan data, visualisasi, pembagian data, imputasi, encoding, dan scaling, serta `imbalanced-learn` untuk resampling.
