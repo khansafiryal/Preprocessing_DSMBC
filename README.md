@@ -25,6 +25,17 @@ Prinsip utama yang digunakan adalah **fit pada training data, kemudian transform
 11. Final preprocessing check
 12. Export processed data
 
+## Pemeriksaan Awal Data
+
+Pemeriksaan awal dilakukan pada data mentah sebelum cleaning:
+
+1. Tipe data, jumlah missing value, dan jumlah exact duplicate
+2. Jumlah nilai unik setiap variabel
+3. Value counts variabel kategorikal dan target, dalam jumlah dan persen
+4. Lima nilai yang paling sering muncul pada setiap variabel numerik
+
+Variabel kategorikal hanya memiliki 2 sampai 7 nilai unik, sehingga One Hot Encoding tidak menambah banyak kolom. Target `loan_status` terdiri dari 78,18 persen kelas 0 dan 21,82 persen kelas 1 pada data mentah.
+
 ## Data Cleaning dan Domain Validation
 
 Exact duplicate dihapus agar observasi yang sama tidak muncul lebih dari satu kali. Domain validation juga dilakukan pada fitur numerik berdasarkan aturan yang digunakan pada latihan.
