@@ -176,14 +176,9 @@ Notebook menghasilkan empat file:
 3. `credit_test_processed.csv`
 4. `credit_train_smote_processed.csv`, yaitu file opsional berisi training hasil SMOTENC
 
-## Mini Assignment
-
-1. **Feature Selection**
-2. **Class Imbalance Handling**
-
-Pada tugas class imbalance, peserta melatih model yang sama pada `X_train_final`, `X_train_under`, `X_train_over`, dan `X_train_smote`, lalu membandingkan recall dan precision kelas 1 pada validation. Peserta juga dapat mencoba `class_weight="balanced"`.
-
-Treatment class imbalance hanya dilakukan pada training data agar validation dan test tetap merepresentasikan distribusi data asli.
+## Mini Challenge
+**Feature Selection**
+Peserta mengevaluasi apakah ada predictor yang redundant atau kurang informatif.
 
 ## Library yang Digunakan
 
